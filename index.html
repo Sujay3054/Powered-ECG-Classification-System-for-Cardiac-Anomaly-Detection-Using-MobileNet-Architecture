@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Analysis System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1>ECG Analysis System</h1>
+                </div>
+                <p class="subtitle">AI-Powered Electrocardiogram Analysis</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <h2><i class="fas fa-upload"></i> Upload ECG Image</h2>
+                        <p>Upload an ECG image for AI-powered analysis and diagnosis</p>
+                    </div>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop ECG Image Here</h3>
+                            <p>or <span class="browse-link">browse files</span></p>
+                            <p class="file-info">Supports: JPG, PNG, JPEG (Max 16MB)</p>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                    </div>
+                    
+                    <div class="upload-actions">
+                        <button class="btn btn-primary" id="analyzeBtn" disabled>
+                            <i class="fas fa-search"></i>
+                            Analyze ECG
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn" disabled>
+                            <i class="fas fa-times"></i>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-card">
+                    <h3><i class="fas fa-image"></i> Image Preview</h3>
+                    <div class="image-preview">
+                        <img id="previewImage" src="" alt="ECG Preview">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Section -->
+            <section class="loading-section" id="loadingSection" style="display: none;">
+                <div class="loading-card">
+                    <div class="loading-spinner">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Analyzing ECG...</h3>
+                    <p>Please wait while our AI processes your ECG image</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <h3><i class="fas fa-chart-line"></i> Analysis Results</h3>
+                        <div class="confidence-badge" id="confidenceBadge">
+                            <span id="confidenceValue">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-main">
+                        <div class="diagnosis">
+                            <h4 id="diagnosisTitle">Normal ECG</h4>
+                            <p id="diagnosisDescription">ECG appears normal with no major abnormalities detected.</p>
+                        </div>
+                        
+                        <div class="severity-indicator">
+                            <div class="severity-badge" id="severityBadge">
+                                <span id="severityText">LOW</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h4><i class="fas fa-stethoscope"></i> Medical Recommendations</h4>
+                        <div class="recommendation-item">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Action Required:</strong>
+                                <span id="actionText">Maintain regular check-ups</span>
+                            </div>
+                        </div>
+                        <div class="recommendation-item">
+                            <i class="fas fa-user-md"></i>
+                            <div>
+                                <strong>Recommendation:</strong>
+                                <span id="recommendationText">Continue regular health monitoring</span>
+                            </div>
+                        </div>
+                        <div class="recommendation-item" id="whySection">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Why this result:</strong>
+                                <ul id="whyList"></ul>
+                            </div>
+                        </div>
+                        <div class="recommendation-item" id="preventionSection">
+                            <i class="fas fa-heart"></i>
+                            <div>
+                                <strong>How to reduce risk:</strong>
+                                <ul id="preventionList"></ul>
+                            </div>
+                        </div>
+                        <div class="recommendation-item" id="nextStepsSection">
+                            <i class="fas fa-clipboard-check"></i>
+                            <div>
+                                <strong>Immediate next steps:</strong>
+                                <ul id="nextStepsList"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detailed-results">
+                        <h4><i class="fas fa-list"></i> Detailed Analysis</h4>
+                        <div class="results-grid" id="resultsGrid">
+                            <!-- Results will be populated here -->
+                        </div>
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="btn btn-primary" id="downloadRxBtn" disabled>
+                                <i class="fas fa-file-download"></i>
+                                Download Prescription
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section" id="errorSection" style="display: none;">
+                <div class="error-card">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h3>Analysis Failed</h3>
+                    <p id="errorMessage">There was an error processing your ECG image. Please try again.</p>
+                    <button class="btn btn-primary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i>
+                        Try Again
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p><i class="fas fa-info-circle"></i> This system is for educational purposes only. Always consult healthcare professionals for medical decisions.</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                    <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+                    <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
